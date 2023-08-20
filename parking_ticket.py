@@ -11,22 +11,19 @@ class ParkingTicket():
     auth_url_root = "https://auth.paybyphoneapis.com"
     api_url_root = "https://consumer.paybyphoneapis.com"
 
-    def __init__(self):
-        with open("credentials.yaml", "r", encoding="utf-8") as credentials_file:
-            credentials = yaml.load(credentials_file, Loader=yaml.SafeLoader)
-        self.login(credentials)
+    def __init__(self, configuration: Dict[str, str]):
+        self.plate_nr = configuration["plate_nr"]
+        self.zip_code = configuration["zip_code"]
+        self.rate_option = configuration["rate_option"]
+        self.login(configuration["username"], configuration["password"])
 
-        self.plate_nr = credentials["plate_nr"]
-        self.zip_code = credentials["zip_code"]
-        self.rate_option = credentials["rate_option"]
-
-    def login(self, credentials: Dict[str, str]):
+    def login(self, username: str, password: str):
         response = requests.post(
             f"{self.auth_url_root}/token",
             data={
                 "grant_type": "password",
-                "username": credentials["username"],
-                "password": credentials["password"],
+                "username": username,
+                "password": password,
                 "client_id": "paybyphone_web",
             },
             headers={
@@ -155,7 +152,12 @@ class ParkingTicket():
 
 
 def main():
-    parking_ticket = ParkingTicket()
+    with open("configuration.yaml", "r", encoding="utf-8") as configuration_file:
+        configuration = yaml.load(configuration_file, Loader=yaml.SafeLoader)
+
+    paybyphone_config = configuration["paybyphone"]
+    parking_ticket = ParkingTicket(paybyphone_config)
+
     print(f"Account ID: {parking_ticket.account_id}")
     print(parking_ticket.pprint_tickets(parking_ticket.account_tickets()))
 

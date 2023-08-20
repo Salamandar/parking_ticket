@@ -5,3 +5,9 @@ paybyphone:
   zip_code: "75013"
   # rate_option can be found by using firefox's dev tools and seeing requests when getting a ticket
   rate_option: "1244259777"
+
+textbelt:
+  # Please change to true if you want notifications!
+  notify: false
+  key: textbelt
+  number: "<phone number for notifications>"

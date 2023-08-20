@@ -6,6 +6,7 @@ import datetime
 import requests
 import yaml
 
+from textbelt import Textbelt
 
 class ParkingTicket():
     auth_url_root = "https://auth.paybyphoneapis.com"
@@ -164,6 +165,13 @@ def main():
     time_start_ticket = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S") + "Z"
     parking_ticket.new_ticket(1, time_start_ticket)
 
+    textbelt_config = configuration["textbelt"]
+    if textbelt_config.get("notify"):
+        textbelt = Textbelt(textbelt_config["key"])
+        text = textbelt.send(textbelt_config["number"], "Ticket pris aujourd'hui!")
+        received, status = text.wait_until_received()
+        if not received:
+            print(f"Text message not received in 10s, status was {status}")
 
 
 if __name__ == "__main__":
